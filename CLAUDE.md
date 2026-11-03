@@ -24,6 +24,7 @@ Status: pre-launch landing page only. No backend, no routing beyond `/`.
 | UI | **React 19.3.0** |
 | Styling | **Tailwind CSS v4** wired through the `@tailwindcss/turbopack` loader (see `next.config.ts` → `turbopack.rules["*.css"]`). Most styling is hand-written CSS, not utility classes. |
 | Language | TypeScript 5 |
+| Analytics | **`@vercel/analytics`** — `<Analytics />` from `@vercel/analytics/next`, rendered once in `app/layout.tsx` `<body>`. Reports on Vercel deployments. |
 | Config flags | `devIndicators: false` (hides the on-screen "N" dev indicator), `cacheComponents: true`, `partialPrefetching: true`, `experimental.agentFeedback: true` (all in `next.config.ts`). |
 
 ### ⚠️ Critical gotchas (learned the hard way)
@@ -45,7 +46,7 @@ Status: pre-launch landing page only. No backend, no routing beyond `/`.
 ```
 girlslikeus/
 ├── app/
-│   ├── layout.tsx     # <html>/<body>, metadata, Google Fonts <link>s
+│   ├── layout.tsx     # <html>/<body>, metadata, Google Fonts <link>s, Vercel <Analytics />
 │   ├── page.tsx       # THE landing page — a "use client" component (all logic here)
 │   ├── globals.css    # ALL styling + animations (hand-written CSS + Tailwind import)
 │   ├── icon.png       # tab/browser favicon (256²) — generated from public/GLU_Logo.jpg
