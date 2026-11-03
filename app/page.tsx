@@ -168,7 +168,7 @@ export default function Home() {
 
         <p className="footer r9">© 2026 Girls Like Us — A wardrobe for girls like us.</p>
         <p className="footer r9" style={{ marginTop: "0.35rem" }}>
-          Heart-Picker by Divyalakshmi
+          Hand Picked by Divyalakshmi
         </p>
       </section>
     </main>
