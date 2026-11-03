@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  devIndicators: false, // hide the on-screen Next.js dev indicator ("N" button)
   experimental: {
     agentFeedback: true,
   },
