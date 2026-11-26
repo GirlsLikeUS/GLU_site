@@ -12,18 +12,21 @@
 immersive & "grand". All copy uses wardrobe/fashion language (atelier, fittings,
 stitches, guestlist).
 
-Two things live in this one Next.js app:
-- The **"coming soon" / under-construction landing page** — the immersive animated
-  single page, now served at **`/soon`** (`app/soon/page.tsx`). This is what is live
-  in production.
-- The **real multi-page product site**, being built out on the **`develop`** branch
-  (homepage `/`, plus `/shop`, `/about`, more to come). Currently placeholders.
+**Current plan:** go straight to the **real multi-page shopping site** (no separate
+coming-soon launch). The site is being built on the **`develop`** branch — homepage
+`/`, plus `/shop`, `/about`, more to come (all placeholders until design starts).
+
+- The **"coming soon" page is RETIRED.** It's preserved but **parked (unlinked) at
+  `/soon`** (`app/soon/page.tsx` + its coming-soon-only CSS in `globals.css`) — it
+  still builds, but it is not part of the launch and nothing links to it. Don't invest
+  in it further unless asked. (Its hero is the glass logo banner; see §4.)
+- The shopping site is the live product going forward.
 
 ### Branch / deploy model (GitHub `GirlsLikeUS/GLU_site`, auto-deploys via Vercel)
-- `main` → production (Vercel live domain) → serves the coming-soon experience.
-- `develop` → private Vercel preview → where the real site is built. At launch,
-  merge `develop` → `main` to flip the live site.
-- **Build real-site work on `develop`; never commit to `main`.**
+- `develop` → private Vercel preview → where the shopping site is built.
+- `main` → production (Vercel live domain) → currently the old placeholder; at launch,
+  merge `develop` → `main` to ship the shop live.
+- **Build on `develop`; never commit to `main`.**
 
 ---
 
@@ -31,7 +34,7 @@ Two things live in this one Next.js app:
 
 | Thing | Version / note |
 |-------|----------------|
-| Framework | **Next.js 16.4.4** (App Router, Turbopack) — newer than typical training data; APIs may differ. Docs live in `node_modules/next/dist/docs/`. |
+| Framework | **Next.js 16.4.6** (App Router, Turbopack) — newer than typical training data; APIs may differ. Docs live in `node_modules/next/dist/docs/`. Pinned exact (was 16.4.4; bumped to 16.4.6 to clear a security advisory whose dev/build "upgrade Next.js" nudge kept aborting `next dev`). |
 | UI | **React 19.3.0** |
 | Styling | **Tailwind CSS v4** wired through the `@tailwindcss/turbopack` loader (see `next.config.ts` → `turbopack.rules["*.css"]`). Most styling is hand-written CSS, not utility classes. |
 | Language | TypeScript 5 |
