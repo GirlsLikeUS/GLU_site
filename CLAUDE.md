@@ -66,8 +66,8 @@ girlslikeus/
 │   ├── icon.png         # tab/browser favicon (256²) — generated from public/GLU_Logo.jpg
 │   └── apple-icon.png   # iOS home-screen icon (180²) — generated from public/GLU_Logo.jpg
 ├── public/
-│   ├── GLU_Logo.jpg   # circular pink badge logo → used as the hero logo
-│   └── GLU_Main.png   # coquette wordmark + bow (cream bg) → faint background watermark
+│   ├── GLU_Logo.jpg   # circular pink badge → favicon source only (icon.png/apple-icon.png); no longer shown on the page
+│   └── GLU_Main.png   # coquette wordmark + bow (cream bg) → hero logo BANNER on /soon (multiply) + faint background watermark
 ├── next.config.ts     # turbopack tailwind loader + experimental flags
 ├── CLAUDE.md          # this file (architecture map)
 ├── README.md          # human-facing intro; points here for architecture
@@ -101,7 +101,11 @@ girlslikeus/
     4. `.petals` — falling emoji (from `PETALS`)
     5. `.card` — the glass content panel:
        - `.tag` "In the Atelier" pill (pulsing dot)
-       - `.logo-wrap` → rotating `.halo` behind the `.logo`
+       - `.logo-banner` → **hero logo banner**: glass `.banner-plate` framing the
+         `GLU_Main.png` wordmark (`.banner-mark`, `mix-blend-mode: multiply` melts the
+         cream bg into the glass; `object-fit: cover` crops it to a banner letterbox),
+         with a `.banner-glow` rose-gold halo behind and a `.banner-sheen` foil sweep
+         (replaces the old round `GLU_Logo.jpg` badge + rotating halo)
        - `.script` + `.headline` (`.shimmer` = animated rose-gold foil on 2nd line)
        - `.lede` paragraph + `.rule` ribbon (🎀) divider
        - **`.seam`** — the stitching animation (needle 🪡 sewing a running stitch);
@@ -122,7 +126,8 @@ grouped selector and the `prefers-reduced-motion` list in `globals.css`.
 Sectioned with `/* ===== NAME ===== */` banners, in this order:
 `:root` palette vars → base/body → `.stage` (+ parallax vars) → living background
 (`.bg`, `.aurora`, `.watermark`, `.grain`, `.vignette`, `.cursor-glow`) → `.petals`
-→ `.card` + reveal (`.r1`–`.r9`, `@keyframes rise`) → `.tag` → logo+halo →
+→ `.card` + reveal (`.r1`–`.r9`, `@keyframes rise`) → `.tag` → **logo banner**
+(`.logo-banner`/`.banner-glow`/`.banner-plate`/`.banner-mark`/`.banner-sheen`) →
 text (`.script`/`.headline`/`.shimmer`/`.lede`/`.rule`) → **stitching seam**
 (`.seam`, `@keyframes march`/`stitch`/`needleBob`) → `.rail-label` → newsletter
 `.form` (incl. `:disabled` states) → `.socials`/`.footer` → media queries →
@@ -142,6 +147,7 @@ when adding animations).
 | Instagram URL | `app/soon/page.tsx` → `href="https://www.instagram.com/girlslikeus.store/"` |
 | Gmail address | `app/soon/page.tsx` → `mailto:girlslikeusstore@gmail.com` |
 | **WhatsApp number** | `app/soon/page.tsx` → `href="https://wa.me/"` — **still a placeholder**, needs `wa.me/<countrycode><number>` |
+| Hero logo banner | `.logo-banner`/`.banner-plate`/`.banner-mark`/`.banner-glow`/`.banner-sheen` in `globals.css`; art = `public/GLU_Main.png` (tune crop via `.banner-mark` `aspect-ratio`/`object-position`) |
 | Colors | `:root` vars in `globals.css` |
 | Falling decor | `PETALS` array in `app/soon/page.tsx` |
 | Stitching speed/shape | `.seam` block in `globals.css` (`@keyframes stitch` duration, `offset-path`) + matching `d="..."` paths in `app/soon/page.tsx` (keep the 3 path strings identical) |

@@ -83,10 +83,13 @@ export default function Home() {
           In the Atelier
         </span>
 
-        <div className="logo-wrap r2">
-          <span className="halo" aria-hidden="true" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="logo" src="/GLU_Logo.jpg" alt="Girls Like Us logo" />
+        <div className="logo-banner r2">
+          <span className="banner-glow" aria-hidden="true" />
+          <span className="banner-plate">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="banner-mark" src="/GLU_Main.png" alt="Girls Like Us" />
+            <span className="banner-sheen" aria-hidden="true" />
+          </span>
         </div>
 
         <p className="script r3">Something beautiful is on the hanger…</p>
