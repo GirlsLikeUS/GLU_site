@@ -8,11 +8,22 @@
 
 ## 1. What this is
 
-A single-page **"coming soon" / under-construction site** for **Girls Like Us**, a
-female wardrobe/fashion brand. Theme: trendy, girlish, pink, immersive & "grand".
-All copy uses wardrobe/fashion language (atelier, fittings, stitches, guestlist).
+**Girls Like Us**, a female wardrobe/fashion brand. Theme: trendy, girlish, pink,
+immersive & "grand". All copy uses wardrobe/fashion language (atelier, fittings,
+stitches, guestlist).
 
-Status: pre-launch landing page only. No backend, no routing beyond `/`.
+Two things live in this one Next.js app:
+- The **"coming soon" / under-construction landing page** — the immersive animated
+  single page, now served at **`/soon`** (`app/soon/page.tsx`). This is what is live
+  in production.
+- The **real multi-page product site**, being built out on the **`develop`** branch
+  (homepage `/`, plus `/shop`, `/about`, more to come). Currently placeholders.
+
+### Branch / deploy model (GitHub `GirlsLikeUS/GLU_site`, auto-deploys via Vercel)
+- `main` → production (Vercel live domain) → serves the coming-soon experience.
+- `develop` → private Vercel preview → where the real site is built. At launch,
+  merge `develop` → `main` to flip the live site.
+- **Build real-site work on `develop`; never commit to `main`.**
 
 ---
 
@@ -46,11 +57,14 @@ Status: pre-launch landing page only. No backend, no routing beyond `/`.
 ```
 girlslikeus/
 ├── app/
-│   ├── layout.tsx     # <html>/<body>, metadata, Google Fonts <link>s, Vercel <Analytics />
-│   ├── page.tsx       # THE landing page — a "use client" component (all logic here)
-│   ├── globals.css    # ALL styling + animations (hand-written CSS + Tailwind import)
-│   ├── icon.png       # tab/browser favicon (256²) — generated from public/GLU_Logo.jpg
-│   └── apple-icon.png # iOS home-screen icon (180²) — generated from public/GLU_Logo.jpg
+│   ├── layout.tsx       # <html>/<body>, metadata, Google Fonts <link>s, Vercel <Analytics /> — shared by ALL pages
+│   ├── page.tsx         # REAL product homepage (/) — placeholder starting point
+│   ├── soon/page.tsx    # THE coming-soon landing page (/soon) — "use client", all its logic (moved from app/page.tsx)
+│   ├── shop/page.tsx     # real-site Shop (/shop) — scaffold placeholder
+│   ├── about/page.tsx    # real-site About (/about) — scaffold placeholder
+│   ├── globals.css      # ALL styling + animations (hand-written CSS + Tailwind import)
+│   ├── icon.png         # tab/browser favicon (256²) — generated from public/GLU_Logo.jpg
+│   └── apple-icon.png   # iOS home-screen icon (180²) — generated from public/GLU_Logo.jpg
 ├── public/
 │   ├── GLU_Logo.jpg   # circular pink badge logo → used as the hero logo
 │   └── GLU_Main.png   # coquette wordmark + bow (cream bg) → faint background watermark
@@ -65,7 +79,12 @@ girlslikeus/
 
 ---
 
-## 4. `app/page.tsx` structure
+## 4. `app/soon/page.tsx` structure (the coming-soon page)
+
+> The real-site pages (`app/page.tsx`, `app/shop/page.tsx`, `app/about/page.tsx`) are
+> currently minimal server-component placeholders. The rich structure below is the
+> coming-soon page, which was moved intact from `app/page.tsx` to `app/soon/page.tsx`
+> (asset paths are absolute, e.g. `/GLU_Logo.jpg`, so the move needs no path edits).
 
 `"use client"` component (needs client-side JS for mouse parallax). Top-to-bottom:
 
@@ -119,13 +138,14 @@ when adding animations).
 
 | Want to change | Where |
 |----------------|-------|
-| Headline / copy | `app/page.tsx` (`.headline`, `.lede`, labels) |
-| Instagram URL | `page.tsx` → `href="https://www.instagram.com/girlslikeus.store/"` |
-| Gmail address | `page.tsx` → `mailto:girlslikeusstore@gmail.com` |
-| **WhatsApp number** | `page.tsx` → `href="https://wa.me/"` — **still a placeholder**, needs `wa.me/<countrycode><number>` |
+| Coming-soon headline / copy | `app/soon/page.tsx` (`.headline`, `.lede`, labels) |
+| Instagram URL | `app/soon/page.tsx` → `href="https://www.instagram.com/girlslikeus.store/"` |
+| Gmail address | `app/soon/page.tsx` → `mailto:girlslikeusstore@gmail.com` |
+| **WhatsApp number** | `app/soon/page.tsx` → `href="https://wa.me/"` — **still a placeholder**, needs `wa.me/<countrycode><number>` |
 | Colors | `:root` vars in `globals.css` |
-| Falling decor | `PETALS` array in `page.tsx` |
-| Stitching speed/shape | `.seam` block in `globals.css` (`@keyframes stitch` duration, `offset-path`) + matching `d="..."` paths in `page.tsx` (keep the 3 path strings identical) |
+| Falling decor | `PETALS` array in `app/soon/page.tsx` |
+| Stitching speed/shape | `.seam` block in `globals.css` (`@keyframes stitch` duration, `offset-path`) + matching `d="..."` paths in `app/soon/page.tsx` (keep the 3 path strings identical) |
+| Real-site homepage / nav | `app/page.tsx` (plus `app/shop/`, `app/about/`) |
 | Page title / fonts | `app/layout.tsx` |
 
 ### Known TODO / not yet wired
