@@ -135,10 +135,119 @@ function SizeFilter({
   );
 }
 
+/* Product photo carousel — auto-advances every 3s, loops, and supports
+   swipe / drag and tap dots or arrows. Falls back to nothing for 0–1 photos. */
+function PhotoCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [i, setI] = useState(0);
+  const [dragPx, setDragPx] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startX = useRef(0);
+  const widthRef = useRef(1);
+  const draggingRef = useRef(false);
+  const n = images.length;
+
+  const go = (next: number) => setI(((next % n) + n) % n);
+
+  // autoplay: reschedules on every change, so manual nav also resets the 3s timer
+  useEffect(() => {
+    if (n <= 1) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const t = setTimeout(() => {
+      if (!draggingRef.current) setI((p) => (p + 1) % n);
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [i, n]);
+
+  const onDown = (e: React.PointerEvent) => {
+    draggingRef.current = true;
+    setIsDragging(true);
+    startX.current = e.clientX;
+    widthRef.current = e.currentTarget.clientWidth || 1;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const onMove = (e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    setDragPx(e.clientX - startX.current);
+  };
+  const onEnd = (e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setIsDragging(false);
+    const dx = e.clientX - startX.current;
+    const threshold = Math.max(40, widthRef.current * 0.15);
+    if (dx <= -threshold) go(i + 1);
+    else if (dx >= threshold) go(i - 1);
+    setDragPx(0);
+  };
+  const stop = (e: React.PointerEvent) => e.stopPropagation();
+
+  return (
+    <div
+      className="glu-carousel"
+      onPointerDown={onDown}
+      onPointerMove={onMove}
+      onPointerUp={onEnd}
+      onPointerCancel={onEnd}
+    >
+      <div
+        className="glu-cartrack"
+        style={{
+          transform: `translateX(calc(${-i * 100}% + ${dragPx}px))`,
+          transition: isDragging ? "none" : "transform 0.45s cubic-bezier(0.4, 0.1, 0.2, 1)",
+        }}
+      >
+        {images.map((src, k) => (
+          <div className="glu-carslide" key={k}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt={`${alt} — photo ${k + 1}`} draggable={false} />
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="glu-carnav glu-carprev"
+        onPointerDown={stop}
+        onClick={() => go(i - 1)}
+        aria-label="Previous photo"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        className="glu-carnav glu-carnext"
+        onPointerDown={stop}
+        onClick={() => go(i + 1)}
+        aria-label="Next photo"
+      >
+        ›
+      </button>
+      <div className="glu-cardots">
+        {images.map((_, k) => (
+          <button
+            type="button"
+            key={k}
+            className={`glu-cardot${k === i ? " glu-cardot-on" : ""}`}
+            onPointerDown={stop}
+            onClick={() => go(k)}
+            aria-label={`Go to photo ${k + 1}`}
+            aria-current={k === i}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({ p }: { p: Product }) {
   const sold = p.status === "sold";
   // sizes that currently have stock, in the canonical S→Free size order
   const availSizes = SIZES.filter((s) => (p.stock?.[s] ?? 0) > 0);
+  // all photos for this piece (fall back to the single img field, then none)
+  const images = p.images && p.images.length ? p.images : p.img ? [p.img] : [];
   const msg = sold
     ? `Hi! Could you tell me if ${p.name} will be restocked?`
     : `Hi! I'd like to order ${p.name}. Colour: `;
@@ -148,9 +257,11 @@ function ProductCard({ p }: { p: Product }) {
         className="glu-photo"
         style={{ background: `linear-gradient(160deg, ${p.tones[0]}, ${p.tones[1]})` }}
       >
-        {p.img ? (
+        {images.length > 1 ? (
+          <PhotoCarousel images={images} alt={p.name} />
+        ) : images.length === 1 ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={p.img} alt={p.name} />
+          <img src={images[0]} alt={p.name} draggable={false} />
         ) : (
           <Bow color={p.bow} />
         )}

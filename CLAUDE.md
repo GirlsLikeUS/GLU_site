@@ -256,6 +256,10 @@ After any change, run `npm run build` to confirm it compiles, then update this f
   (`.glu-chips { position: relative; z-index: 20 }`). Each
   product card lists its in-stock sizes as pills ("Available: S · M · L …", `.glu-sizes`);
   out-of-stock sizes are hidden, and a card with no stock shows no size line.
+- **Product photos:** a card with 2+ photos renders a `PhotoCarousel` (in `app/page.tsx`,
+  styled `.glu-car*` in `app/home.css`) — auto-advances every 3s, loops, supports
+  swipe/drag (pointer events, `touch-action: pan-y`) and tap arrows/dots; honours
+  prefers-reduced-motion. 0–1 photos render a plain `<img>` (or the bow fallback).
   **Photos:** Supabase Storage bucket `product-photos`
   (public read). **Auth:** Supabase Auth (email+password) for the single admin user.
 - **Security = RLS, not the key.** The `anon`/publishable key is public by design (it's in
