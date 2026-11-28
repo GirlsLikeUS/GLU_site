@@ -6,8 +6,8 @@ export type ProductType = "Exclusive" | "Dresses" | "Tops" | "Sets" | "Shirts";
 export type ProductStatus = "available" | "sold";
 
 /** The sizes the shop stocks. Used by the admin stock editor and the size filter. */
-export type Size = "S" | "M" | "L" | "XL" | "Free size";
-export const SIZES: Size[] = ["S", "M", "L", "XL", "Free size"];
+export type Size = "XS" | "S" | "M" | "L" | "XL" | "Free size";
+export const SIZES: Size[] = ["XS", "S", "M", "L", "XL", "Free size"];
 
 export type Product = {
   /** DB row id — present on products loaded from Supabase; absent for the static seed */
