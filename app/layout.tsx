@@ -3,9 +3,9 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Girls Like Us — Coming Soon",
+  title: "Girls Like Us — Curated Western Wear",
   description:
-    "Something beautiful is on the hanger. Girls Like Us — a wardrobe made for girls like us. Our collection is being styled to perfection. Coming soon.",
+    "Curated women's western wear from Chennai. A small collection of dresses, shirts and sets, hand-picked and wrapped like a gift. Order on WhatsApp.",
 };
 
 export default function RootLayout({

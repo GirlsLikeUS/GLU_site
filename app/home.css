@@ -1,0 +1,408 @@
+/* ============================================================
+   Girls Like Us — real homepage styles.
+   Shop content (from the reference) dressed in the coming-soon
+   atelier theme. Global CSS (this project's convention — CSS
+   Modules don't work through the @tailwindcss/turbopack loader).
+   Every class is `glu-` prefixed so nothing collides with the
+   coming-soon classes in globals.css. Imported only by app/page.tsx,
+   so it loads on / but not on /soon.
+   Palette vars (--blush, --rose, --raspberry, --plum, --gold …)
+   come from :root in globals.css.
+   ============================================================ */
+@import "tailwindcss";
+
+.glu-root {
+  --mx: 0;
+  --my: 0;
+  --cx: 50vw;
+  --cy: 50vh;
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+  overflow-x: hidden;
+  padding-bottom: 2rem;
+}
+
+/* ===== living background ===== */
+.glu-bg {
+  position: fixed;
+  inset: -10%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 120% at 50% 0%, #fff6fa 0%, #fcdcea 42%, #f6b9d0 100%);
+}
+.glu-aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.8;
+  mix-blend-mode: screen;
+  transform: translate(calc(var(--mx) * var(--p, 30px)), calc(var(--my) * var(--p, 30px)));
+  will-change: transform;
+}
+.glu-a1 { width: 46vmax; height: 46vmax; background: radial-gradient(circle, #ff9ec4, transparent 65%); top: -12%; left: -8%; --p: 55px; animation: gluFloatA 20s ease-in-out infinite; }
+.glu-a2 { width: 40vmax; height: 40vmax; background: radial-gradient(circle, #ffd7a8, transparent 65%); bottom: -14%; right: -6%; --p: 40px; animation: gluFloatB 26s ease-in-out infinite; }
+.glu-a3 { width: 38vmax; height: 38vmax; background: radial-gradient(circle, #e59bff, transparent 65%); bottom: 4%; left: -10%; --p: 70px; animation: gluFloatA 23s ease-in-out infinite reverse; }
+.glu-a4 { width: 34vmax; height: 34vmax; background: radial-gradient(circle, #ff8fae, transparent 60%); top: -6%; right: 2%; --p: 48px; animation: gluFloatB 19s ease-in-out infinite; }
+@keyframes gluFloatA { 50% { transform: translate(calc(var(--mx) * var(--p) + 6vmax), calc(var(--my) * var(--p) + 4vmax)) scale(1.1); } }
+@keyframes gluFloatB { 50% { transform: translate(calc(var(--mx) * var(--p) - 5vmax), calc(var(--my) * var(--p) - 5vmax)) scale(1.08); } }
+
+.glu-wm {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("/GLU_Main.png") center 22% / min(900px, 118%) no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.04;
+  transform: translate(calc(var(--mx) * -16px), calc(var(--my) * -16px));
+  will-change: transform;
+}
+.glu-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+.glu-vig {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(130% 110% at 50% 30%, transparent 55%, rgba(124, 51, 80, 0.2) 100%);
+}
+.glu-cursor {
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 1;
+  pointer-events: none;
+  width: 520px; height: 520px;
+  margin: -260px 0 0 -260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 221, 236, 0.4), transparent 60%);
+  mix-blend-mode: screen;
+  transform: translate(var(--cx), var(--cy));
+}
+
+/* ===== falling couture ===== */
+.glu-petals { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.glu-petals span {
+  position: absolute;
+  top: -8%;
+  opacity: 0;
+  filter: drop-shadow(0 4px 6px rgba(182, 61, 98, 0.18));
+  animation-name: gluFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes gluFall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(112vh) rotate(380deg); opacity: 0; }
+}
+
+/* ===== layout primitives ===== */
+.glu-wrap {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: clamp(16px, 4vw, 40px);
+  padding-right: clamp(16px, 4vw, 40px);
+}
+
+.glu-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  filter: blur(6px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.75, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.75, 0.2, 1), filter 0.9s ease;
+  will-change: opacity, transform;
+}
+.glu-reveal.glu-in { opacity: 1; transform: none; filter: none; }
+
+/* ===== buttons ===== */
+.glu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: "Poppins", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 13px 24px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  color: #fff;
+  background: linear-gradient(135deg, var(--raspberry), var(--raspberry-deep));
+  box-shadow: 0 14px 28px -10px rgba(182, 61, 98, 0.6);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.glu-btn:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 18px 34px -10px rgba(182, 61, 98, 0.7); }
+.glu-btn:active { transform: translateY(0); }
+.glu-btn svg { width: 17px; height: 17px; flex: none; }
+.glu-ghost {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--raspberry-deep);
+  border-color: var(--petal);
+  box-shadow: 0 8px 20px -12px rgba(182, 61, 98, 0.5);
+}
+.glu-ghost:hover { background: rgba(255, 255, 255, 0.85); }
+.glu-small { padding: 10px 16px; font-size: 0.8rem; }
+
+/* ===== header ===== */
+.glu-header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: rgba(255, 248, 251, 0.72);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid rgba(247, 198, 214, 0.55);
+}
+.glu-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 66px; }
+.glu-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; min-width: 0; }
+.glu-brand img { width: 40px; height: 40px; border-radius: 50%; flex: none; object-fit: cover; box-shadow: 0 4px 12px -4px rgba(182, 61, 98, 0.5); }
+.glu-brand span { font-family: "Playfair Display", serif; font-weight: 600; color: var(--plum); font-size: 1.15rem; white-space: nowrap; }
+.glu-nav { display: none; gap: 28px; font-size: 0.85rem; color: #8a5f6e; }
+.glu-nav a { text-decoration: none; transition: color 0.15s; }
+.glu-nav a:hover { color: var(--raspberry); }
+@media (min-width: 820px) { .glu-nav { display: flex; } }
+
+/* ===== hero ===== */
+.glu-hero { padding-block: clamp(36px, 7vw, 76px) clamp(28px, 5vw, 52px); }
+.glu-herogrid { display: grid; gap: 34px; align-items: center; grid-template-columns: minmax(0, 1fr); }
+.glu-eyebrow {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(1.45rem, 4vw, 1.9rem);
+  color: var(--rose);
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+.glu-h1 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(2.2rem, 6.4vw, 3.7rem);
+  line-height: 1.07;
+  letter-spacing: -0.01em;
+  color: var(--plum);
+  margin: 0;
+}
+.glu-shimmer {
+  background: linear-gradient(100deg, var(--raspberry) 0%, var(--gold-deep) 25%, #ffe9c7 42%, var(--gold-deep) 58%, var(--raspberry) 80%, var(--raspberry) 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: italic;
+  animation: gluSheen 6s linear infinite;
+}
+@keyframes gluSheen { to { background-position: 250% center; } }
+.glu-lede { font-size: clamp(1rem, 2.1vw, 1.1rem); line-height: 1.7; font-weight: 300; color: #74505c; margin: 18px 0 0; max-width: 46ch; }
+.glu-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.glu-facts { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 26px 0 0; padding: 0; list-style: none; font-size: 0.82rem; color: #8a5f6e; }
+.glu-facts li::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--raspberry); margin-right: 9px; vertical-align: middle; }
+
+.glu-med {
+  position: relative;
+  justify-self: center;
+  width: min(64vw, 320px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.glu-halo {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 158, 196, 0.6), rgba(231, 195, 155, 0.3) 48%, transparent 72%);
+  filter: blur(26px);
+  animation: gluHalo 7s ease-in-out infinite;
+}
+@keyframes gluHalo { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+.glu-med img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 40px 80px -36px rgba(124, 51, 80, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: gluMed 6s ease-in-out infinite;
+}
+@keyframes gluMed { 50% { transform: translateY(-8px); } }
+@media (min-width: 820px) {
+  .glu-herogrid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 56px; }
+  .glu-med { width: min(100%, 360px); justify-self: end; }
+}
+/* mobile: shrink the hero medallion so it doesn't dominate the screen */
+@media (max-width: 560px) {
+  .glu-med { width: min(46vw, 188px); }
+}
+
+/* ===== section heads ===== */
+.glu-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+.glu-kicker { font-family: "Dancing Script", cursive; font-size: clamp(1.2rem, 3vw, 1.5rem); color: var(--rose); margin: 0; }
+.glu-h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 4.4vw, 2.4rem);
+  line-height: 1.12;
+  color: var(--plum);
+  margin: 0;
+}
+.glu-sub { color: #8a5f6e; font-size: 0.95rem; margin: 2px 0 0; max-width: 52ch; }
+
+/* ===== collection ===== */
+.glu-collection { padding-block: clamp(20px, 4vw, 40px) clamp(24px, 5vw, 48px); }
+.glu-chips { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 26px; }
+.glu-chip {
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #8a5f6e;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--petal);
+  transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+.glu-chip:hover { transform: translateY(-1px); }
+.glu-chip-on { background: var(--plum); color: #fff; border-color: var(--plum); }
+
+.glu-products { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 820px) { .glu-products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+
+.glu-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(255, 253, 254, 0.8), rgba(255, 244, 249, 0.6));
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 30px 60px -34px rgba(124, 51, 80, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.9s, filter 0.9s;
+}
+.glu-card:hover { transform: translateY(-4px); box-shadow: 0 40px 70px -34px rgba(124, 51, 80, 0.6); }
+.glu-photo { position: relative; aspect-ratio: 4 / 5; display: grid; place-items: center; overflow: hidden; }
+.glu-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.glu-bow { width: 36%; opacity: 0.85; filter: drop-shadow(0 6px 10px rgba(124, 51, 80, 0.25)); }
+.glu-sold .glu-photo { filter: grayscale(0.5); opacity: 0.72; }
+.glu-ptag {
+  position: absolute; top: 10px; left: 10px;
+  font-size: 0.66rem; line-height: 1; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: 999px;
+  color: var(--raspberry-deep);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--petal);
+}
+.glu-info { padding: 15px 15px 17px; display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.glu-info h3 { font-family: "Playfair Display", serif; font-weight: 600; font-size: 1.15rem; line-height: 1.2; color: var(--plum); margin: 0; }
+.glu-meta { font-size: 0.74rem; color: #8a5f6e; margin: 0; }
+.glu-desc { font-size: 0.85rem; color: #6a4452; line-height: 1.5; margin: 2px 0 0; }
+.glu-colours { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.glu-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--petal); flex: none; }
+.glu-names { font-size: 0.72rem; color: #8a5f6e; }
+.glu-buy { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.glu-price { font-family: "Playfair Display", serif; font-size: 1.3rem; color: var(--raspberry-deep); font-variant-numeric: tabular-nums; }
+.glu-sold .glu-price { color: #a97d8c; text-decoration: line-through; text-decoration-thickness: 1px; }
+.glu-buy .glu-btn { width: 100%; }
+
+/* ===== styling band ===== */
+.glu-styling { padding-block: clamp(8px, 2vw, 20px) clamp(24px, 5vw, 48px); }
+.glu-band {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: clamp(26px, 5vw, 44px);
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(251, 217, 228, 0.6), rgba(255, 244, 249, 0.5));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 30px 60px -34px rgba(124, 51, 80, 0.5);
+}
+.glu-band p { color: #74505c; max-width: 52ch; margin: 0; }
+
+/* ===== steps ===== */
+.glu-how { padding-block: clamp(8px, 2vw, 20px) clamp(24px, 5vw, 48px); }
+.glu-steps { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.glu-step {
+  padding: 24px 22px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 22px 44px -32px rgba(124, 51, 80, 0.45);
+}
+.glu-step b { display: block; font-family: "Playfair Display", serif; font-weight: 600; font-size: 1.6rem; color: var(--gold-deep); margin-bottom: 6px; }
+.glu-step h3 { font-family: "Playfair Display", serif; font-weight: 600; font-size: 1.2rem; color: var(--plum); margin: 0 0 6px; }
+.glu-step p { font-size: 0.9rem; color: #74505c; line-height: 1.6; margin: 0; }
+@media (min-width: 760px) { .glu-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+
+/* ===== details list ===== */
+.glu-details { padding-block: clamp(8px, 2vw, 20px) clamp(24px, 5vw, 48px); }
+.glu-list { margin: 0; border-top: 1px solid var(--petal); }
+.glu-list > div { display: grid; gap: 4px 28px; padding: 18px 0; border-bottom: 1px solid var(--petal); grid-template-columns: minmax(0, 1fr); }
+.glu-list dt { font-family: "Playfair Display", serif; font-weight: 600; color: var(--plum); font-size: 1.1rem; }
+.glu-list dd { margin: 0; color: #74505c; font-size: 0.93rem; line-height: 1.6; max-width: 62ch; }
+@media (min-width: 760px) { .glu-list > div { grid-template-columns: 200px minmax(0, 1fr); } }
+
+/* ===== about ===== */
+.glu-about { padding-block: clamp(8px, 2vw, 20px) clamp(28px, 5vw, 56px); }
+.glu-inner {
+  display: grid;
+  gap: 14px;
+  max-width: 64ch;
+  padding: clamp(26px, 5vw, 44px);
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgba(255, 253, 254, 0.78), rgba(255, 244, 249, 0.55));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 40px 80px -40px rgba(124, 51, 80, 0.5);
+}
+.glu-script { font-family: "Dancing Script", cursive; font-size: clamp(1.4rem, 3.4vw, 1.8rem); color: var(--rose); margin: 0; }
+.glu-about p { color: #74505c; margin: 0; line-height: 1.7; }
+.glu-about a { color: var(--raspberry); font-weight: 500; }
+
+/* ===== footer ===== */
+.glu-footer { position: relative; z-index: 3; border-top: 1px solid rgba(247, 198, 214, 0.55); margin-top: clamp(16px, 4vw, 40px); padding-block: clamp(32px, 5vw, 48px) 28px; }
+.glu-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.glu-links { display: flex; flex-wrap: wrap; gap: 12px; }
+.glu-fine { font-size: 0.78rem; color: #a97d8c; margin: 6px 0 0; }
+
+/* ===== floating order button ===== */
+.glu-float {
+  position: fixed;
+  right: clamp(14px, 3vw, 26px);
+  bottom: clamp(14px, 3vw, 26px);
+  z-index: 25;
+  box-shadow: 0 18px 34px -10px rgba(182, 61, 98, 0.7);
+}
+
+@media (max-width: 480px) {
+  .glu-cursor { display: none; }
+  .glu-float span { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glu-aurora, .glu-petals span, .glu-halo, .glu-med img, .glu-shimmer { animation: none !important; }
+  .glu-reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+  .glu-wm, .glu-cursor { transform: none !important; }
+  .glu-shimmer { color: var(--raspberry); -webkit-text-fill-color: var(--raspberry); }
+}
