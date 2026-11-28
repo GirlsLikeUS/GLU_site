@@ -5,10 +5,12 @@ import {
   PRODUCTS,
   SWATCH,
   FILTERS,
+  SIZES,
   waLink,
   rupees,
   IG_URL,
   type Product,
+  type Size,
 } from "./shop-data";
 import { createClient } from "@/lib/supabase/browser";
 import { fetchProducts, supabaseConfigured } from "@/lib/products";
@@ -52,8 +54,91 @@ const Bow = ({ color }: { color: string }) => (
   </svg>
 );
 
+/* Themed size filter — a custom dropdown so the open menu matches the site
+   (a native <select>'s option list is drawn by the OS and can't be styled). */
+function SizeFilter({
+  value,
+  onChange,
+}: {
+  value: "All" | Size;
+  onChange: (v: "All" | Size) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const options: Array<"All" | Size> = ["All", ...SIZES];
+  const label = (v: "All" | Size) => (v === "All" ? "All sizes" : v);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="glu-sizefilter" ref={ref}>
+      <span className="glu-sizes-cap">Size</span>
+      <div className="glu-sizedd">
+        <button
+          type="button"
+          className={`glu-sizebtn${open ? " glu-sizebtn-open" : ""}`}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span>{label(value)}</span>
+          <svg className="glu-sizecaret" viewBox="0 0 12 8" aria-hidden="true">
+            <path
+              d="M1 1.5 6 6.5 11 1.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        {open && (
+          <ul className="glu-sizemenu" role="listbox" aria-label="Filter by size">
+            {options.map((o) => (
+              <li key={o} role="option" aria-selected={value === o}>
+                <button
+                  type="button"
+                  className={`glu-sizeopt${value === o ? " glu-sizeopt-on" : ""}`}
+                  onClick={() => {
+                    onChange(o);
+                    setOpen(false);
+                  }}
+                >
+                  <span>{label(o)}</span>
+                  {value === o && (
+                    <span className="glu-sizecheck" aria-hidden="true">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({ p }: { p: Product }) {
   const sold = p.status === "sold";
+  // sizes that currently have stock, in the canonical S→Free size order
+  const availSizes = SIZES.filter((s) => (p.stock?.[s] ?? 0) > 0);
   const msg = sold
     ? `Hi! Could you tell me if ${p.name} will be restocked?`
     : `Hi! I'd like to order ${p.name}. Colour: `;
@@ -86,6 +171,16 @@ function ProductCard({ p }: { p: Product }) {
           ))}
           <span className="glu-names">{p.colours.join(", ")}</span>
         </div>
+        {!sold && availSizes.length > 0 && (
+          <p className="glu-sizes">
+            <span className="glu-sizes-label">Available</span>
+            {availSizes.map((s) => (
+              <span key={s} className="glu-size-pill">
+                {s}
+              </span>
+            ))}
+          </p>
+        )}
         <div className="glu-buy">
           <span className="glu-price">{rupees(p.price)}</span>
           <a
@@ -106,6 +201,7 @@ function ProductCard({ p }: { p: Product }) {
 export default function Home() {
   const stageRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
+  const [size, setSize] = useState<"All" | Size>("All");
   // Static seed renders instantly; live DB products replace it once loaded.
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
 
@@ -171,11 +267,12 @@ export default function Home() {
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [filter, products]);
+  }, [filter, size, products]);
 
-  const shown = products.filter((p) => filter === "All" || p.type === filter).sort(
-    (a, b) => Number(a.status === "sold") - Number(b.status === "sold")
-  );
+  const shown = products
+    .filter((p) => filter === "All" || p.type === filter)
+    .filter((p) => size === "All" || (p.stock?.[size] ?? 0) > 0)
+    .sort((a, b) => Number(a.status === "sold") - Number(b.status === "sold"));
 
   return (
     <div className="glu-root" ref={stageRef} id="top">
@@ -281,24 +378,33 @@ export default function Home() {
               New pieces are added as they arrive. When a piece is gone, it&apos;s gone.
             </p>
           </div>
-          <div className="glu-chips glu-reveal" role="group" aria-label="Filter by type">
+          <div className="glu-chips glu-reveal" role="group" aria-label="Filter by type and size">
             {FILTERS.map((f) => (
               <button
                 key={f}
                 type="button"
-                className={`glu-chip${filter === f ? " glu-chip-on" : ""}`}
+                className={`glu-chip${f === "Exclusive" ? " glu-chip-lux" : ""}${filter === f ? " glu-chip-on" : ""}`}
                 aria-pressed={filter === f}
                 onClick={() => setFilter(f)}
               >
                 {f}
               </button>
             ))}
+            <SizeFilter value={size} onChange={setSize} />
           </div>
-          <div className="glu-products">
-            {shown.map((p) => (
-              <ProductCard key={p.id ?? p.name} p={p} />
-            ))}
-          </div>
+          {shown.length === 0 ? (
+            <p className="glu-empty">
+              {size === "All"
+                ? "Nothing in this selection just yet. Try another category."
+                : `No pieces in size ${size} right now. Try another size or category.`}
+            </p>
+          ) : (
+            <div className="glu-products">
+              {shown.map((p) => (
+                <ProductCard key={p.id ?? p.name} p={p} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* ---- styling band ---- */}

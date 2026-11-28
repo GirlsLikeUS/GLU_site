@@ -10,11 +10,12 @@
 create table if not exists public.products (
   id          uuid primary key default gen_random_uuid(),
   name        text    not null,
-  category    text    not null default 'Dresses' check (category in ('Dresses','Tops','Sets')),
+  category    text    not null default 'Dresses' check (category in ('Exclusive','Dresses','Tops','Sets','Shirts')),
   price       integer not null default 0,                 -- whole rupees
   status      text    not null default 'available' check (status in ('available','sold')),
   fit         text    not null default '',                -- free-text fit / size note
-  sizes       text[]  not null default '{}',              -- optional explicit sizes, e.g. {XS,S,M}
+  sizes       text[]  not null default '{}',              -- sizes with stock (derived from stock), e.g. {S,M}
+  stock       jsonb   not null default '{}'::jsonb,        -- quantity per size, e.g. {"S":2,"Free size":1}
   colours     text[]  not null default '{}',              -- colour names (e.g. {Black,Ivory})
   description text    not null default '',
   images      text[]  not null default '{}',              -- public URLs of uploaded photos (up to ~4)

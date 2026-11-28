@@ -4,7 +4,7 @@
 // app/shop-data.ts whenever Supabase isn't configured or a query fails.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Product, ProductType, ProductStatus } from "@/app/shop-data";
+import type { Product, ProductType, ProductStatus, Size } from "@/app/shop-data";
 
 /** A row as stored in the Supabase `products` table. */
 export type ProductRow = {
@@ -15,6 +15,7 @@ export type ProductRow = {
   status: ProductStatus;
   fit: string;
   sizes: string[] | null;
+  stock: Partial<Record<Size, number>> | null;
   colours: string[] | null;
   description: string;
   images: string[] | null;
@@ -37,6 +38,7 @@ export function rowToProduct(r: ProductRow): Product {
     fit: r.fit ?? "",
     colours: r.colours ?? [],
     sizes: r.sizes ?? [],
+    stock: r.stock ?? {},
     tones: [r.tone_a || "#F6CFC8", r.tone_b || "#C4485E"],
     bow: DEFAULT_BOW,
     img: images[0] || "",

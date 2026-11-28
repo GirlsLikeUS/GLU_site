@@ -13,10 +13,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/browser";
 import { fetchProducts, supabaseConfigured } from "@/lib/products";
-import { rupees, type Product, type ProductType, type ProductStatus } from "../shop-data";
+import {
+  rupees,
+  SIZES,
+  type Product,
+  type ProductType,
+  type ProductStatus,
+  type Size,
+} from "../shop-data";
 import "./admin.css";
 
-const CATEGORIES: ProductType[] = ["Dresses", "Tops", "Sets"];
+const CATEGORIES: ProductType[] = ["Exclusive", "Dresses", "Tops", "Sets", "Shirts"];
 const STATUSES: ProductStatus[] = ["available", "sold"];
 const BUCKET = "product-photos";
 const MAX_PHOTOS = 4;
@@ -31,6 +38,7 @@ function emptyForm(): Product {
     fit: "",
     colours: [],
     sizes: [],
+    stock: {},
     tones: ["#F6CFC8", "#C4485E"],
     bow: "#7A2E48",
     img: "",
@@ -42,6 +50,17 @@ function emptyForm(): Product {
 const toList = (s: string) =>
   s.split(",").map((x) => x.trim()).filter(Boolean);
 const fromList = (a?: string[]) => (a ?? []).join(", ");
+
+/** Total units across all sizes. */
+function totalStock(stock?: Partial<Record<Size, number>>): number {
+  return SIZES.reduce((n, s) => n + (stock?.[s] ?? 0), 0);
+}
+/** "S·2   M·1   Free size·3" — only sizes that have stock. */
+function stockSummary(stock?: Partial<Record<Size, number>>): string {
+  return SIZES.filter((s) => (stock?.[s] ?? 0) > 0)
+    .map((s) => `${s}·${stock![s]}`)
+    .join("   ");
+}
 
 /** Pull the storage path out of a public URL so we can delete the file. */
 function storagePath(url: string): string | null {
@@ -253,7 +272,7 @@ function Dashboard({
                 </p>
                 <p className="adm-row-meta">
                   {p.type} · {rupees(p.price)}
-                  {p.sizes && p.sizes.length > 0 && <> · {p.sizes.join(", ")}</>}
+                  {totalStock(p.stock) > 0 && <> · {stockSummary(p.stock)}</>}
                 </p>
               </div>
               <div className="adm-row-actions">
@@ -302,7 +321,6 @@ function ProductForm({
   const isNew = !initial.id;
   const [f, setF] = useState<Product>(initial);
   const [coloursText, setColoursText] = useState(fromList(initial.colours));
-  const [sizesText, setSizesText] = useState(fromList(initial.sizes));
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -310,6 +328,12 @@ function ProductForm({
 
   const set = <K extends keyof Product>(k: K, v: Product[K]) =>
     setF((prev) => ({ ...prev, [k]: v }));
+
+  const setQty = (size: Size, v: number) =>
+    setF((prev) => ({
+      ...prev,
+      stock: { ...(prev.stock ?? {}), [size]: Math.max(0, Math.round(v) || 0) },
+    }));
 
   const images = f.images ?? [];
 
@@ -358,13 +382,15 @@ function ProductForm({
     }
     setBusy(true);
     setError("");
+    const stock = f.stock ?? {};
     const row = {
       name: f.name.trim(),
       category: f.type,
       price: Math.max(0, Math.round(Number(f.price) || 0)),
       status: f.status,
       fit: f.fit,
-      sizes: toList(sizesText),
+      stock,
+      sizes: SIZES.filter((s) => (stock[s] ?? 0) > 0),
       colours: toList(coloursText),
       description: f.desc,
       images,
@@ -436,23 +462,35 @@ function ProductForm({
               </select>
             </label>
             <label className="adm-field">
-              <span>Sizes (comma separated)</span>
+              <span>Fit note</span>
               <input
-                value={sizesText}
-                onChange={(e) => setSizesText(e.target.value)}
-                placeholder="XS, S, M"
+                value={f.fit}
+                onChange={(e) => set("fit", e.target.value)}
+                placeholder="Free size, fits bust up to 38&quot;"
               />
             </label>
           </div>
 
-          <label className="adm-field">
-            <span>Fit note</span>
-            <input
-              value={f.fit}
-              onChange={(e) => set("fit", e.target.value)}
-              placeholder="Free size, fits bust up to 38&quot;"
-            />
-          </label>
+          <div className="adm-field">
+            <span>Stock by size (quantity available)</span>
+            <div className="adm-stock">
+              {SIZES.map((s) => (
+                <label className="adm-stock-cell" key={s}>
+                  <span>{s}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={f.stock?.[s] ?? 0}
+                    onChange={(e) => setQty(s, Number(e.target.value))}
+                  />
+                </label>
+              ))}
+            </div>
+            <p className="adm-hint">
+              Enter how many of each size you have. A size with 0 won&apos;t appear when
+              shoppers filter the collection by that size.
+            </p>
+          </div>
 
           <label className="adm-field">
             <span>Colours (comma separated)</span>

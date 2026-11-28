@@ -2,8 +2,12 @@
 // One entry per piece. Content ported from the reference site.
 // Fill in WHATSAPP_NUMBER and each product's `img` when photos are ready.
 
-export type ProductType = "Dresses" | "Tops" | "Sets";
+export type ProductType = "Exclusive" | "Dresses" | "Tops" | "Sets" | "Shirts";
 export type ProductStatus = "available" | "sold";
+
+/** The sizes the shop stocks. Used by the admin stock editor and the size filter. */
+export type Size = "S" | "M" | "L" | "XL" | "Free size";
+export const SIZES: Size[] = ["S", "M", "L", "XL", "Free size"];
 
 export type Product = {
   /** DB row id — present on products loaded from Supabase; absent for the static seed */
@@ -14,8 +18,10 @@ export type Product = {
   status: ProductStatus;
   fit: string;
   colours: string[];
-  /** optional explicit sizes, e.g. ["XS","S","M"] */
+  /** sizes that currently have stock (derived from `stock`); kept for display */
   sizes?: string[];
+  /** quantity in stock per size, e.g. { S: 2, M: 0, "Free size": 1 } */
+  stock?: Partial<Record<Size, number>>;
   /** two tones that build the card's gradient backdrop */
   tones: [string, string];
   /** bow fallback colour when there's no photo yet */
@@ -31,7 +37,7 @@ export type Product = {
 export const WHATSAPP_NUMBER = "916383929959";
 export const INSTAGRAM = "girlslikeus.store";
 
-export const FILTERS: Array<"All" | ProductType> = ["All", "Dresses", "Tops", "Sets"];
+export const FILTERS: Array<"All" | ProductType> = ["All", "Exclusive", "Dresses", "Tops", "Sets", "Shirts"];
 
 export const PRODUCTS: Product[] = [
   {

@@ -99,6 +99,7 @@ girlslikeus/
 ├── supabase/
 │   ├── schema.sql       # one-time setup: products table + storage bucket + GRANTs + RLS + 9-product seed
 │   ├── FIX-grants.sql   # tiny follow-up: grants table access to anon/authenticated (if schema predates the grant fix)
+│   ├── add-stock.sql    # migration: adds `stock` jsonb + widens category CHECK to the 5 categories (run on projects predating these)
 │   └── SETUP.md         # human step-by-step: create project, run schema, make admin user, copy keys
 ├── .env.local          # Supabase URL + anon key (GIT-IGNORED; also set these in Vercel)
 ├── public/
@@ -238,8 +239,24 @@ After any change, run `npm run build` to confirm it compiles, then update this f
 
 ### Pieces
 - **DB:** Supabase Postgres `products` table (see `supabase/schema.sql` for columns:
-  `name, category, price, status, fit, sizes[], colours[], description, images[],
-  tone_a, tone_b, sort_order, …`). **Photos:** Supabase Storage bucket `product-photos`
+  `name, category, price, status, fit, sizes[], stock(jsonb), colours[], description,
+  images[], tone_a, tone_b, sort_order, …`). **Categories** (order shown in the homepage
+  filter and the admin dropdown): `Exclusive, Dresses, Tops, Sets, Shirts` — defined once as
+  `ProductType`/`FILTERS` in `app/shop-data.ts` and `CATEGORIES` in `app/admin/page.tsx`.
+  "Exclusive" gets a gold/bling chip style (`.glu-chip-lux` in `app/home.css`). A DB
+  `category` CHECK constraint must list all 5 — widened by `supabase/add-stock.sql`.
+  **Sizes & stock:** sizes are fixed — `S, M, L, XL, Free size` (`Size`/`SIZES` in
+  `app/shop-data.ts`). `stock` is a jsonb map of quantity per size (e.g. `{"S":2,"Free size":1}`);
+  the admin form edits per-size quantities, and on save writes `stock` plus derives the
+  `sizes[]` array (sizes with qty > 0). The homepage has a **size filter** (dropdown at the
+  far right of the category chips) that shows only pieces with `stock[size] > 0`. It's a
+  custom themed dropdown (`SizeFilter` in `app/page.tsx`, styled `.glu-size*` in
+  `app/home.css`) — not a native `<select>`, whose open option list the browser draws and
+  CSS can't theme. Its open menu needs the chip row lifted above the grid
+  (`.glu-chips { position: relative; z-index: 20 }`). Each
+  product card lists its in-stock sizes as pills ("Available: S · M · L …", `.glu-sizes`);
+  out-of-stock sizes are hidden, and a card with no stock shows no size line.
+  **Photos:** Supabase Storage bucket `product-photos`
   (public read). **Auth:** Supabase Auth (email+password) for the single admin user.
 - **Security = RLS, not the key.** The `anon`/publishable key is public by design (it's in
   the browser). Safety comes from row-level security: anyone may `select`, only an
@@ -269,5 +286,7 @@ After any change, run `npm run build` to confirm it compiles, then update this f
 
 ### Still TODO
 - Run `supabase/FIX-grants.sql` if an older `schema.sql` (without GRANTs) was already run.
+- Run `supabase/add-stock.sql` on any project created before the stock/new-category change
+  (adds the `stock` column and lets the DB accept Exclusive/Shirts products).
 - Add the two env vars to Vercel before the production launch.
 - Product reordering isn't in the admin UI yet (new items append; `sort_order` set on insert).
